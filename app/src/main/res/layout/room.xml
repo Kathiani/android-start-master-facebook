@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <Button
+        android:text="Beleza"
+        android:layout_width="342dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnRoom1"
+        android:textColorLink="@android:color/holo_red_light" />
+
+    <Button
+        android:text="Trabalho"
+        android:layout_width="343dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnRoom2" />
+
+    <Button
+        android:text="Violência"
+        android:layout_width="344dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnRoom3" />
+
+    <Button
+        android:text="Assédio"
+        android:layout_width="344dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnRoom4" />
+
+    <Button
+        android:text="Saúde"
+        android:layout_width="344dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnRoom5" />
+
+    <Button
+        android:text="Maternidade"
+        android:layout_width="346dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/btnRoom6" />
+</LinearLayout>
