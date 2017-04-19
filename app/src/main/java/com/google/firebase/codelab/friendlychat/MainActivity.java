@@ -138,6 +138,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    public void LoadPerfil(){
+        setContentView(R.layout.perfil);
+        //inserir botões , exemplo botão de atualizar perfil
+
+
+    }
+
     public void LoadRooms() {
         setContentView(R.layout.room);
 
@@ -352,6 +359,11 @@ public class MainActivity extends AppCompatActivity
                 setContentView(R.layout.room);
                 startActivity(new Intent(this, MainActivity.class));
                 return true;
+            case R.id.btnPerfil:
+                setContentView(R.layout.perfil);
+               // startActivity(new Intent(this, MainActivity.class));
+                return true;
+
             default:
                 return super.onOptionsItemSelected(item);
         }

@@ -23,7 +23,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
+import android.view.LayoutInflater;
+import android.view.ViewGroup;
 
+
+import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.appindexing.Thing;
@@ -42,6 +46,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.facebook.FacebookSdk;
 
+
 public class SignInActivity extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener, View.OnClickListener {
 
@@ -50,6 +55,8 @@ public class SignInActivity extends AppCompatActivity implements
 
     private SignInButton mSignInButton;
 
+//    private LoginButton loginButton;
+//    private CallbackManager callbackManager;
     private GoogleApiClient mGoogleApiClient;
 
     // Firebase instance variables
@@ -60,6 +67,37 @@ public class SignInActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
+
+//        LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+//            //View view = inflater.inflate(R.layout.splash, container, false);
+//
+//            loginButton = (LoginButton) findViewById(R.id.login_button);
+//            loginButton.setReadPermissions("email");
+//            // If using in a fragment
+//            loginButton.setFragment(this);
+//            // Other app specific specialization
+//
+//            // Callback registration
+//            loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+//                @Override
+//                public void onSuccess(LoginResult loginResult) {
+//                    // App code
+//                }
+//
+//                @Override
+//                public void onCancel() {
+//                    // App code
+//                }
+//
+//                @Override
+//                public void onError(FacebookException exception) {
+//                    // App code
+//                }
+//            });
+
+
+
+
 
            // Assign fields
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
