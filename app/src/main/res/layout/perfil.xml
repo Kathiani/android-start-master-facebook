@@ -2,38 +2,37 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:weightSum="1">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/perfilfoto"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:srcCompat="@drawable/ic_account_circle_black_36dp" />
+        app:srcCompat="@drawable/ic_account_circle_black_36dp"
+        android:layout_weight="0.19" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/perfilnome"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="Nome"
         android:textColor="@android:color/black"
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/perfilpseudônimo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="Pseudônimo"
         android:textColor="@android:color/black"
         android:textSize="18sp" />
 
     <TextView
-        android:id="@+id/textView3"
+        android:id="@+id/perfilemail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="10dp"
-        android:text="E-mail"
         android:textColor="@android:color/black"
         android:textSize="18sp" />
 
@@ -47,12 +46,13 @@
         android:textSize="18sp" />
 
     <RadioGroup
+        android:id="@+id/perfilradiotipo"
         android:layout_width="match_parent"
         android:layout_height="88dp"
-        android:checkedButton="@+id/visivelComo" >
+        android:checkedButton="@+id/visivelComo">
 
         <RadioButton
-            android:id="@+id/radioButton3"
+            android:id="@+id/radioperfilpessoal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -60,7 +60,7 @@
             android:textSize="17sp" />
 
         <RadioButton
-            android:id="@+id/radioButton4"
+            android:id="@+id/radioperfilpseudonimo"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"

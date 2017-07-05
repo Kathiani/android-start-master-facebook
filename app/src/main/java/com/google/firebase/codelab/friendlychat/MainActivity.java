@@ -38,6 +38,8 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.net.Uri;
+import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
@@ -64,6 +66,8 @@ import com.google.firebase.appindexing.FirebaseUserActions;
 import com.google.firebase.appindexing.Indexable;
 import com.google.firebase.appindexing.builders.Indexables;
 import com.google.firebase.appindexing.builders.PersonBuilder;
+
+import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -140,7 +144,41 @@ public class MainActivity extends AppCompatActivity
 
     public void LoadPerfil(){
         setContentView(R.layout.perfil);
-        //inserir botões , exemplo botão de atualizar perfil
+
+
+        ImageView ivPhoto = (ImageView) findViewById(R.id.perfilfoto);
+        TextView tvName = (TextView) findViewById(R.id.perfilnome);
+        TextView tvEmail = (TextView) findViewById(R.id.perfilemail);
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) {
+            // Name, email address, and profile photo Url
+
+            tvName.setText(user.getDisplayName());
+            tvEmail.setText(user.getEmail());
+            //ivPhoto.setImageURI(user.getPhotoUrl());
+
+            //VER COMO FAZ A IMAGEM
+
+
+            //ivPhoto.setImageResource(R.drawable.ic_account_circle_black_36dp);
+
+            //ivPhoto.setImageURI(Uri.parse("https://cdn.pixabay.com/photo/2014/03/25/16/54/user-297566_960_720"));
+
+
+
+            // The user's ID, unique to the Firebase project. Do NOT use this value to
+            // authenticate with your backend server, if you have one. Use
+            // FirebaseUser.getToken() instead.
+            String uid = user.getUid();
+        }
+
+
+
+
+
+
+
 
 
     }
@@ -360,7 +398,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this, MainActivity.class));
                 return true;
             case R.id.btnPerfil:
-                setContentView(R.layout.perfil);
+               LoadPerfil();
                // startActivity(new Intent(this, MainActivity.class));
                 return true;
 
