@@ -48,6 +48,7 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInvite;
 import com.google.android.gms.appinvite.AppInviteInvitation;
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -66,6 +67,10 @@ import com.google.firebase.appindexing.FirebaseUserActions;
 import com.google.firebase.appindexing.Indexable;
 import com.google.firebase.appindexing.builders.Indexables;
 import com.google.firebase.appindexing.builders.PersonBuilder;
+import android.os.AsyncTask;
+import android.graphics.Bitmap;
+import java.io.InputStream;
+import android.graphics.BitmapFactory;
 
 import org.w3c.dom.Text;
 
@@ -135,6 +140,8 @@ public class MainActivity extends AppCompatActivity
             return;
         } else {
             mUsername = mFirebaseUser.getDisplayName();
+
+
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
             }
@@ -146,7 +153,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.perfil);
 
 
-        ImageView ivPhoto = (ImageView) findViewById(R.id.perfilfoto);
+        //ImageView ivPhoto = (ImageView) findViewById(R.id.perfilfoto);
         TextView tvName = (TextView) findViewById(R.id.perfilnome);
         TextView tvEmail = (TextView) findViewById(R.id.perfilemail);
 
@@ -156,6 +163,27 @@ public class MainActivity extends AppCompatActivity
 
             tvName.setText(user.getDisplayName());
             tvEmail.setText(user.getEmail());
+
+
+            new DownloadImageTask((ImageView) findViewById(R.id.perfilfoto))
+                    .execute("https://lh3.googleusercontent.com/-qIVTe9UJsrE/AAAAAAAAAAI/AAAAAAAAAAA/DZWhYBLCH-M/s64-c/114962592658835654228.jpg");
+
+
+
+           // Log.d(TAG, user.getPhotoUrl().toString());
+
+            //"http://picasaweb.google.com/data/entry/api/user/renatassmendes@gmail.com?alt=json"
+
+
+//            Glide.with(MainActivity.this)
+//                    .load(user.getPhotoUrl().toString())
+//                    .into(ivPhoto);
+//
+//            ivPhoto.setVisibility(View.VISIBLE);
+//
+//            Log.d("CREATION","url: " + user.getPhotoUrl());
+
+
             //ivPhoto.setImageURI(user.getPhotoUrl());
 
             //VER COMO FAZ A IMAGEM
@@ -163,9 +191,7 @@ public class MainActivity extends AppCompatActivity
 
             //ivPhoto.setImageResource(R.drawable.ic_account_circle_black_36dp);
 
-            //ivPhoto.setImageURI(Uri.parse("https://cdn.pixabay.com/photo/2014/03/25/16/54/user-297566_960_720"));
-
-
+            //ivPhoto.setImageURI(Uri.parse("http://mariaterezaimoveis.com.br/wp-content/uploads/2015/03/casa.jpg"));
 
             // The user's ID, unique to the Firebase project. Do NOT use this value to
             // authenticate with your backend server, if you have one. Use
@@ -173,14 +199,31 @@ public class MainActivity extends AppCompatActivity
             String uid = user.getUid();
         }
 
+    }
 
+    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+        ImageView bmImage;
 
+        public DownloadImageTask(ImageView bmImage) {
+            this.bmImage = bmImage;
+        }
 
+        protected Bitmap doInBackground(String... urls) {
+            String urldisplay = urls[0];
+            Bitmap mIcon11 = null;
+            try {
+                InputStream in = new java.net.URL(urldisplay).openStream();
+                mIcon11 = BitmapFactory.decodeStream(in);
+            } catch (Exception e) {
+                Log.e("Error", e.getMessage());
+                e.printStackTrace();
+            }
+            return mIcon11;
+        }
 
-
-
-
-
+        protected void onPostExecute(Bitmap result) {
+            bmImage.setImageBitmap(result);
+        }
     }
 
     public void LoadRooms() {
