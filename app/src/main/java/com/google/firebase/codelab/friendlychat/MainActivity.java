@@ -153,7 +153,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.perfil);
 
 
-        //ImageView ivPhoto = (ImageView) findViewById(R.id.perfilfoto);
+        ImageView ivPhoto = (ImageView) findViewById(R.id.perfilfoto);
         TextView tvName = (TextView) findViewById(R.id.perfilnome);
         TextView tvEmail = (TextView) findViewById(R.id.perfilemail);
 
@@ -161,18 +161,29 @@ public class MainActivity extends AppCompatActivity
         if (user != null) {
             // Name, email address, and profile photo Url
 
-            tvName.setText(user.getDisplayName());
+            //tvName.setText(user.getDisplayName());
+           tvName.setText(mPhotoUrl);
             tvEmail.setText(user.getEmail());
 
 
-            new DownloadImageTask((ImageView) findViewById(R.id.perfilfoto))
-                    .execute("https://lh3.googleusercontent.com/-qIVTe9UJsrE/AAAAAAAAAAI/AAAAAAAAAAA/DZWhYBLCH-M/s64-c/114962592658835654228.jpg");
+           // new DownloadImageTask((ImageView) findViewById(R.id.perfilfoto))
+                   // .execute("https://lh3.googleusercontent.com/-qIVTe9UJsrE/AAAAAAAAAAI/AAAAAAAAAAA/DZWhYBLCH-M/s64-c/114962592658835654228.jpg");
 
+            //  SE QUISER VOLTAR A USAR ISSO TEM Q DESCOMENTAR ALI EM BAIXO TBM A FUNCAO
+
+            //new DownloadImageTask((ImageView) findViewById(R.id.perfilfoto))
+              // .execute(mPhotoUrl); // FUNCIONA COM ALGUNS PERFIS E OUTROS NAO
 
 
            // Log.d(TAG, user.getPhotoUrl().toString());
 
-            //"http://picasaweb.google.com/data/entry/api/user/renatassmendes@gmail.com?alt=json"
+            //"http://picasaweb.google.com/data/entry/api/user/renatassmendes@gmail.com?alt=json" // ULTIMO CAMPO DESSE
+                    //JSON É O LINK DA IMAGEM DE PERFIL
+
+
+            Glide.with(MainActivity.this)
+                    .load(mPhotoUrl)
+                    .into(ivPhoto); //FUNIONA PARA ALGUNS OUTROS NAO.. SERA SE TEM A VER COM GOOGLE+ ?
 
 
 //            Glide.with(MainActivity.this)
@@ -182,12 +193,9 @@ public class MainActivity extends AppCompatActivity
 //            ivPhoto.setVisibility(View.VISIBLE);
 //
 //            Log.d("CREATION","url: " + user.getPhotoUrl());
-
+           // ivPhoto.setImageURI(Uri.parse(mPhotoUrl));
 
             //ivPhoto.setImageURI(user.getPhotoUrl());
-
-            //VER COMO FAZ A IMAGEM
-
 
             //ivPhoto.setImageResource(R.drawable.ic_account_circle_black_36dp);
 
@@ -201,30 +209,32 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
+    //APARENTEMENTE NAO VAI PRECISAR DISSO MAIS
+//
+//    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
+//        ImageView bmImage;
+//
+//        public DownloadImageTask(ImageView bmImage) {
+//            this.bmImage = bmImage;
+//        }
+//
+//        protected Bitmap doInBackground(String... urls) {
+//            String urldisplay = urls[0];
+//            Bitmap mIcon11 = null;
+//            try {
+//                InputStream in = new java.net.URL(urldisplay).openStream();
+//                mIcon11 = BitmapFactory.decodeStream(in);
+//            } catch (Exception e) {
+//                Log.e("Error", e.getMessage());
+//                e.printStackTrace();
+//            }
+//            return mIcon11;
+//        }
 
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String... urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                Log.e("Error", e.getMessage());
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
-        }
-    }
+ //       protected void onPostExecute(Bitmap result) {
+         //   bmImage.setImageBitmap(result);
+       // }
+  //  }
 
     public void LoadRooms() {
         setContentView(R.layout.room);
@@ -442,7 +452,6 @@ public class MainActivity extends AppCompatActivity
                 return true;
             case R.id.btnPerfil:
                LoadPerfil();
-               // startActivity(new Intent(this, MainActivity.class));
                 return true;
 
             default:
