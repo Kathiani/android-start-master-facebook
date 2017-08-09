@@ -161,8 +161,8 @@ public class MainActivity extends AppCompatActivity
         if (user != null) {
             // Name, email address, and profile photo Url
 
-            //tvName.setText(user.getDisplayName());
-           tvName.setText(mPhotoUrl);
+            tvName.setText(user.getDisplayName());
+           //tvName.setText(mPhotoUrl);
             tvEmail.setText(user.getEmail());
 
 
@@ -442,7 +442,10 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.sign_out_menu:
                 mFirebaseAuth.signOut();
-                Auth.GoogleSignInApi.signOut(mGoogleApiClient);
+
+                mFirebaseUser = null;
+
+                //Auth.GoogleSignInApi.signOut(mGoogleApiClient); // foi transferido para o signInActivity.java
                 mUsername = ANONYMOUS;
                 startActivity(new Intent(this, SignInActivity.class));
                 return true;
