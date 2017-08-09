@@ -27,6 +27,11 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
 
+import com.facebook.AccessToken;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookCallback;
+import com.facebook.FacebookException;
+import com.facebook.login.LoginResult;
 import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
@@ -42,6 +47,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FacebookAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.GoogleAuthProvider;
 import com.facebook.FacebookSdk;
@@ -62,44 +68,16 @@ public class SignInActivity extends AppCompatActivity implements
     // Firebase instance variables
     private FirebaseAuth mFirebaseAuth;
 
+    // Facebook variables
+    private LoginButton loginButton;
+    private CallbackManager callbackManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_in);
 
-//        LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-//            //View view = inflater.inflate(R.layout.splash, container, false);
-//
-//            loginButton = (LoginButton) findViewById(R.id.login_button);
-//            loginButton.setReadPermissions("email");
-//            // If using in a fragment
-//            loginButton.setFragment(this);
-//            // Other app specific specialization
-//
-//            // Callback registration
-//            loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-//                @Override
-//                public void onSuccess(LoginResult loginResult) {
-//                    // App code
-//                }
-//
-//                @Override
-//                public void onCancel() {
-//                    // App code
-//                }
-//
-//                @Override
-//                public void onError(FacebookException exception) {
-//                    // App code
-//                }
-//            });
-
-
-
-
-
-           // Assign fields
+        // Assign fields
         mSignInButton = (SignInButton) findViewById(R.id.sign_in_button);
 
         // Set click listeners
@@ -119,6 +97,30 @@ public class SignInActivity extends AppCompatActivity implements
 
         // Initialize FirebaseAuth
         mFirebaseAuth = FirebaseAuth.getInstance();
+
+        // Facebook Login
+        callbackManager  =  CallbackManager.Factory.create();
+        loginButton = (LoginButton) findViewById(R.id.button_facebook_login);
+        loginButton.setReadPermissions("email", "public_profile");
+        loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>(){
+            @Override
+            public void onSuccess(LoginResult loginResult) {
+                Log.w(TAG, "Facebook Login Succes: "+ loginResult.getAccessToken().getToken());
+                signInFacebookFirebase(loginResult.getAccessToken());
+            }
+
+            @Override
+            public void onCancel() {
+                Log.w(TAG, "Facebook Cancel");
+            }
+
+            @Override
+            public void onError(FacebookException error) {
+                Log.w(TAG, "Facebook Error");
+                error.printStackTrace();
+            }
+        });
+
     }
 
     @Override
@@ -129,10 +131,9 @@ public class SignInActivity extends AppCompatActivity implements
                 break;
         }
     }
+
     private void signIn() {
-
         Auth.GoogleSignInApi.signOut(mGoogleApiClient); // Antes de logar, deslogamos
-
         Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
@@ -146,15 +147,14 @@ public class SignInActivity extends AppCompatActivity implements
             GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
             if (result.isSuccess()) {
                 // Google Sign In was successful, authenticate with Firebase
-
-
-
                 GoogleSignInAccount account = result.getSignInAccount();
                 firebaseAuthWithGoogle(account);
             } else {
                 // Google Sign In failed
                 Log.e(TAG, "Google Sign In failed.");
             }
+        }else{
+            callbackManager.onActivityResult(requestCode, resultCode, data);
         }
     }
 
@@ -184,10 +184,6 @@ public class SignInActivity extends AppCompatActivity implements
     }
 
 
-    public void sendLoginFacebookData(View view){
-
-    }
-
     @Override
     public void onConnectionFailed(@NonNull ConnectionResult connectionResult) {
         // An unresolvable error has occurred and Google APIs (including Sign-In) will not
@@ -211,6 +207,25 @@ public class SignInActivity extends AppCompatActivity implements
                 .setActionStatus(Action.STATUS_TYPE_COMPLETED)
                 .build();
     }
+
+    private void signInFacebookFirebase(AccessToken accessToken){
+        AuthCredential authCredential = FacebookAuthProvider.getCredential(accessToken.getToken());
+        mFirebaseAuth.signInWithCredential(authCredential).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if(task.isSuccessful()){
+                    Log.d("testeFace", "Facebook Sucesso!");
+                    Toast.makeText(SignInActivity.this, "Facebook Authentication Success", Toast.LENGTH_LONG).show();
+                    Intent i = new Intent(SignInActivity.this, MainActivity.class);
+                    startActivity(i);
+                    finish();
+                }else{
+                    Toast.makeText(SignInActivity.this, "Facebook Authentication  Unsuccess", Toast.LENGTH_LONG).show();
+                }
+            }
+        });
+    }
+
 
     @Override
     public void onStart() {

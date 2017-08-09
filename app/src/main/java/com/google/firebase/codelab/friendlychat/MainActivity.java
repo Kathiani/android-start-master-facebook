@@ -42,6 +42,7 @@ import android.net.Uri;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.facebook.login.LoginManager;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
@@ -140,19 +141,15 @@ public class MainActivity extends AppCompatActivity
             return;
         } else {
             mUsername = mFirebaseUser.getDisplayName();
-
-
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
             }
-
+            LoadRooms();
         }
     }
 
     public void LoadPerfil(){
         setContentView(R.layout.perfil);
-
-
         ImageView ivPhoto = (ImageView) findViewById(R.id.perfilfoto);
         TextView tvName = (TextView) findViewById(R.id.perfilnome);
         TextView tvEmail = (TextView) findViewById(R.id.perfilemail);
@@ -238,7 +235,6 @@ public class MainActivity extends AppCompatActivity
 
     public void LoadRooms() {
         setContentView(R.layout.room);
-
         Button btnGoActivity_main1 = (Button) findViewById(R.id.btnRoom1);
         btnGoActivity_main1.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -442,9 +438,8 @@ public class MainActivity extends AppCompatActivity
         switch (item.getItemId()) {
             case R.id.sign_out_menu:
                 mFirebaseAuth.signOut();
-
                 mFirebaseUser = null;
-
+                LoginManager.getInstance().logOut();
                 //Auth.GoogleSignInApi.signOut(mGoogleApiClient); // foi transferido para o signInActivity.java
                 mUsername = ANONYMOUS;
                 startActivity(new Intent(this, SignInActivity.class));
