@@ -105,6 +105,7 @@ public class SignInActivity extends AppCompatActivity implements
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>(){
             @Override
             public void onSuccess(LoginResult loginResult) {
+                setContentView(R.layout.carregando);
                 Log.w(TAG, "Facebook Login Succes: "+ loginResult.getAccessToken().getToken());
                 signInFacebookFirebase(loginResult.getAccessToken());
             }
@@ -127,6 +128,7 @@ public class SignInActivity extends AppCompatActivity implements
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.sign_in_button:
+                setContentView(R.layout.carregando);
                 signIn();
                 break;
         }
