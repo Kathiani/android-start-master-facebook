@@ -214,8 +214,8 @@ public class SignInActivity extends AppCompatActivity implements
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if(task.isSuccessful()){
-                    Log.d("testeFace", "Facebook Sucesso!");
-                    Toast.makeText(SignInActivity.this, "Facebook Authentication Success", Toast.LENGTH_LONG).show();
+                    //Log.d("testeFace", "Facebook Sucesso!");
+                    //Toast.makeText(SignInActivity.this, "Facebook Authentication Success", Toast.LENGTH_LONG).show();
                     Intent i = new Intent(SignInActivity.this, MainActivity.class);
                     startActivity(i);
                     finish();

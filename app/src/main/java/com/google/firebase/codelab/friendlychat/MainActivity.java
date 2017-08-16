@@ -397,6 +397,11 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    public void onBackPressed(){ //Botão BACK padrão do android
+        startActivity(new Intent(this, MainActivity.class)); //O efeito ao ser pressionado do botão (no caso abre a activity)
+        return;
+    }
+
     @Override
     public void onStart() {
         super.onStart();
@@ -464,4 +469,5 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
     }
+
 }
