@@ -15,6 +15,10 @@
     <item
         android:id="@+id/btnPerfil"
         android:title="Perfil" />
-    <item android:title="Voltar"
+    <item
+        android:title="Voltar"
         android:id="@+id/menuVoltar" />
+    <item
+        android:id="@+id/btnSalas"
+        android:title="Salas" />
 </menu>

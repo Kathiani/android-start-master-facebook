@@ -120,6 +120,8 @@ public class MainActivity extends AppCompatActivity
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
 
+    private CharSequence pseudonimo;
+
     Button btnGoActivity_main, btnGoActivity_main2;
 
     @Override
@@ -144,7 +146,8 @@ public class MainActivity extends AppCompatActivity
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
             }
-            LoadRooms();
+            //LoadRooms();
+            LoadInserePseudonimo();
         }
     }
 
@@ -153,50 +156,19 @@ public class MainActivity extends AppCompatActivity
         ImageView ivPhoto = (ImageView) findViewById(R.id.perfilfoto);
         TextView tvName = (TextView) findViewById(R.id.perfilnome);
         TextView tvEmail = (TextView) findViewById(R.id.perfilemail);
-
+        TextView tvPseudonimo = (TextView) findViewById(R.id.perfilpseudonimo);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // Name, email address, and profile photo Url
 
             tvName.setText(user.getDisplayName());
-           //tvName.setText(mPhotoUrl);
             tvEmail.setText(user.getEmail());
 
-
-           // new DownloadImageTask((ImageView) findViewById(R.id.perfilfoto))
-                   // .execute("https://lh3.googleusercontent.com/-qIVTe9UJsrE/AAAAAAAAAAI/AAAAAAAAAAA/DZWhYBLCH-M/s64-c/114962592658835654228.jpg");
-
-            //  SE QUISER VOLTAR A USAR ISSO TEM Q DESCOMENTAR ALI EM BAIXO TBM A FUNCAO
-
-            //new DownloadImageTask((ImageView) findViewById(R.id.perfilfoto))
-              // .execute(mPhotoUrl); // FUNCIONA COM ALGUNS PERFIS E OUTROS NAO
-
-
-           // Log.d(TAG, user.getPhotoUrl().toString());
-
-            //"http://picasaweb.google.com/data/entry/api/user/renatassmendes@gmail.com?alt=json" // ULTIMO CAMPO DESSE
-                    //JSON É O LINK DA IMAGEM DE PERFIL
-
+            tvPseudonimo.setText(pseudonimo);
 
             Glide.with(MainActivity.this)
                     .load(mPhotoUrl)
-                    .into(ivPhoto); //FUNIONA PARA ALGUNS OUTROS NAO.. SERA SE TEM A VER COM GOOGLE+ ?
-
-
-//            Glide.with(MainActivity.this)
-//                    .load(user.getPhotoUrl().toString())
-//                    .into(ivPhoto);
-//
-//            ivPhoto.setVisibility(View.VISIBLE);
-//
-//            Log.d("CREATION","url: " + user.getPhotoUrl());
-           // ivPhoto.setImageURI(Uri.parse(mPhotoUrl));
-
-            //ivPhoto.setImageURI(user.getPhotoUrl());
-
-            //ivPhoto.setImageResource(R.drawable.ic_account_circle_black_36dp);
-
-            //ivPhoto.setImageURI(Uri.parse("http://mariaterezaimoveis.com.br/wp-content/uploads/2015/03/casa.jpg"));
+                    .into(ivPhoto);
 
             // The user's ID, unique to the Firebase project. Do NOT use this value to
             // authenticate with your backend server, if you have one. Use
@@ -206,32 +178,19 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    //APARENTEMENTE NAO VAI PRECISAR DISSO MAIS
-//
-//    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-//        ImageView bmImage;
-//
-//        public DownloadImageTask(ImageView bmImage) {
-//            this.bmImage = bmImage;
-//        }
-//
-//        protected Bitmap doInBackground(String... urls) {
-//            String urldisplay = urls[0];
-//            Bitmap mIcon11 = null;
-//            try {
-//                InputStream in = new java.net.URL(urldisplay).openStream();
-//                mIcon11 = BitmapFactory.decodeStream(in);
-//            } catch (Exception e) {
-//                Log.e("Error", e.getMessage());
-//                e.printStackTrace();
-//            }
-//            return mIcon11;
-//        }
+    public void LoadInserePseudonimo(){
+        setContentView(R.layout.pseudonimo);
+        Button buttonP = (Button) findViewById(R.id.buttonP);
+        final EditText editTextP = (EditText) findViewById(R.id.editTextP);
 
- //       protected void onPostExecute(Bitmap result) {
-         //   bmImage.setImageBitmap(result);
-       // }
-  //  }
+        buttonP.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                pseudonimo = editTextP.getText();
+                setContentView(R.layout.room);
+            }
+        });
+    }
 
     public void LoadRooms() {
         setContentView(R.layout.room);
@@ -412,7 +371,8 @@ public class MainActivity extends AppCompatActivity
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser != null)
-            LoadRooms();
+            //LoadRooms();
+        LoadInserePseudonimo();
 
     }
 
@@ -456,6 +416,8 @@ public class MainActivity extends AppCompatActivity
             case R.id.btnPerfil:
                LoadPerfil();
                 return true;
+            case R.id.btnSalas:
+                LoadRooms();
 
             default:
                 return super.onOptionsItemSelected(item);
