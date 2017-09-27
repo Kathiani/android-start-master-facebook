@@ -120,7 +120,7 @@ public class MainActivity extends AppCompatActivity
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
 
-    private CharSequence pseudonimo;
+    private String pseudonimo;
 
     Button btnGoActivity_main, btnGoActivity_main2;
 
@@ -146,8 +146,8 @@ public class MainActivity extends AppCompatActivity
             if (mFirebaseUser.getPhotoUrl() != null) {
                 mPhotoUrl = mFirebaseUser.getPhotoUrl().toString();
             }
-            //LoadRooms();
-            LoadInserePseudonimo();
+
+            //LoadInserePseudonimo(mFirebaseUser);
         }
     }
 
@@ -178,18 +178,28 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void LoadInserePseudonimo(){
+    public void LoadInserePseudonimo(FirebaseUser mFirebaseUser){
         setContentView(R.layout.pseudonimo);
         Button buttonP = (Button) findViewById(R.id.buttonP);
         final EditText editTextP = (EditText) findViewById(R.id.editTextP);
 
+       final String userID = mFirebaseUser.getUid();
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference("Pseudonimos");
+        //String nomepeseudonimo = pseudonimo.toString();
+
+
         buttonP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                pseudonimo = editTextP.getText();
-                setContentView(R.layout.room);
+                String frase = editTextP.getText().toString();
+                Pseudonimo pseudo = new Pseudonimo(userID, frase);
+                mFirebaseDatabaseReference.push().setValue(pseudo);
+                LoadRooms();
             }
         });
+
+
+        //String key = mFirebaseDatabaseReference.child("Users").child(userID).setValue();
     }
 
     public void LoadRooms() {
@@ -274,7 +284,7 @@ public class MainActivity extends AppCompatActivity
         mMessageRecyclerView.setLayoutManager(mLinearLayoutManager);
 
         // New child entries
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference(reference);
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference("Messages").child(reference);
         mFirebaseAdapter = new FirebaseRecyclerAdapter<FriendlyMessage,
                 MessageViewHolder>(
                 FriendlyMessage.class,
@@ -370,9 +380,10 @@ public class MainActivity extends AppCompatActivity
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
-        if (mFirebaseUser != null)
-            //LoadRooms();
-        LoadInserePseudonimo();
+        if (mFirebaseUser != null){
+            LoadRooms();
+            LoadInserePseudonimo(mFirebaseUser);
+        }
 
     }
 
@@ -418,7 +429,6 @@ public class MainActivity extends AppCompatActivity
                 return true;
             case R.id.btnSalas:
                 LoadRooms();
-
             default:
                 return super.onOptionsItemSelected(item);
         }
