@@ -100,6 +100,17 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+//    public static class PseudonimoViewHolder extends RecyclerView.ViewHolder {
+//        public TextView pseudonimoTextView;
+//
+//        public MessageViewHolder(View v) {
+//            super(v);
+//            messageTextView = (TextView) itemView.findViewById(R.id.messageTextView);
+//            messengerTextView = (TextView) itemView.findViewById(R.id.messengerTextView);
+//            messengerImageView = (CircleImageView) itemView.findViewById(R.id.messengerImageView);
+//        }
+//    }
+
     private static final String TAG = "MainActivity";
     public static final String MESSAGES_CHILD = "messages";
     private static final int REQUEST_INVITE = 1;
@@ -123,6 +134,9 @@ public class MainActivity extends AppCompatActivity
     private FirebaseUser mFirebaseUser;
     private DatabaseReference mFirebaseDatabaseReference;
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
+
+
+    private String userID;
 
     private String pseudonimo;
 
@@ -161,7 +175,7 @@ public class MainActivity extends AppCompatActivity
         TextView tvName = (TextView) findViewById(R.id.perfilnome);
         TextView tvEmail = (TextView) findViewById(R.id.perfilemail);
         final TextView tvPseudonimo = (TextView) findViewById(R.id.perfilpseudonimo);
-        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // Name, email address, and profile photo Url
 
@@ -173,46 +187,33 @@ public class MainActivity extends AppCompatActivity
 
 
 
-            ValueEventListener nicklistener = new ValueEventListener() {
+
+           // mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference("Messages").child();
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Pseudonimos").child(userID.toString());
+
+
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
-                    //obtem o apelido
-                    String valorApelido = dataSnapshot.child("Pseudonimos").child("nomePseudonimo").getValue().toString();
-                    tvPseudonimo.setText(valorApelido.toString());
+                    if(dataSnapshot.exists()) {
+                        for (DataSnapshot pseudonimoSnapshot : dataSnapshot.getChildren()) {
+                            //The key of the question
+                            String pseudonimoKey = pseudonimoSnapshot.getKey();
+                            //And if you want to access the rest:
+                            String testeNomePseudonimo = pseudonimoSnapshot.child("nomePseudonimo").getValue(String.class);
+                            tvPseudonimo.setText(testeNomePseudonimo);
+                        }
+                    }
+                    else{
+                        tvPseudonimo.setText("Pseudonimo pendente");
+                    }
                 }
 
                 @Override
                 public void onCancelled(DatabaseError databaseError) {
-
                 }
 
-
-            };
-
-
-
-            //pseudonimo mostrado
-            //tvPseudonimo.setText(Pseudonimo.getNomePseudonimo());
-
-            /*DatabaseReference datab = FirebaseDatabase.getInstance().getReference("Pseudonimos");
-
-            datab.child(datab.push().getKey()).addValueEventListener(new ValueEventListener() {
-                @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
-                    String valorPseudonimo;
-                    valorPseudonimo = dataSnapshot.child("apelido").toString();
-                    tvPseudonimo.setText(valorPseudonimo);
-                }
-
-                @Override
-                public void onCancelled(DatabaseError databaseError) {
-
-
-                }
-            });*/
-
-
-
+            });
 
             Glide.with(MainActivity.this)
                     .load(mPhotoUrl)
@@ -227,25 +228,25 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void LoadInserePseudonimo(FirebaseUser mFirebaseUser){
+
         setContentView(R.layout.pseudonimo);
         Button buttonP = (Button) findViewById(R.id.buttonP);
         final EditText editTextP = (EditText) findViewById(R.id.editTextP);
 
-       final String userID = mFirebaseUser.getUid();
-        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference("Pseudonimos");
-        //String nomepeseudonimo = pseudonimo.toString();
+        mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference("Pseudonimos").child(userID);
 
 
         buttonP.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String frase = editTextP.getText().toString();
-                Pseudonimo pseudo = new Pseudonimo(userID, frase);
-                mFirebaseDatabaseReference.push().setValue(pseudo);
+                if(frase != null && !frase.isEmpty()){
+                    Pseudonimo pseudo = new Pseudonimo(userID, frase);
+                    mFirebaseDatabaseReference.push().setValue(pseudo);
+                }
                 LoadRooms();
             }
         });
-
 
         //String key = mFirebaseDatabaseReference.child("Users").child(userID).setValue();
     }
@@ -429,8 +430,29 @@ public class MainActivity extends AppCompatActivity
         mFirebaseAuth = FirebaseAuth.getInstance();
         mFirebaseUser = mFirebaseAuth.getCurrentUser();
         if (mFirebaseUser != null){
-            LoadRooms();
-            LoadInserePseudonimo(mFirebaseUser);
+            //LoadRooms();
+            userID = mFirebaseUser.getUid();
+
+            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Pseudonimos").child(userID.toString());
+
+
+            ref.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if(!dataSnapshot.exists()) {
+                        LoadInserePseudonimo(mFirebaseUser);
+                    }
+                    else {
+                        LoadRooms();
+                    }
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+                }
+            });
+
+
         }
 
     }
