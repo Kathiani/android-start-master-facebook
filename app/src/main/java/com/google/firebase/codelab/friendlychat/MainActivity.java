@@ -42,6 +42,7 @@ import android.net.Uri;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.facebook.login.LoginManager;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.gms.ads.AdRequest;
@@ -58,8 +59,11 @@ import com.google.firebase.analytics.FirebaseAnalytics;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.crash.FirebaseCrash;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.firebase.appindexing.Action;
@@ -156,7 +160,7 @@ public class MainActivity extends AppCompatActivity
         ImageView ivPhoto = (ImageView) findViewById(R.id.perfilfoto);
         TextView tvName = (TextView) findViewById(R.id.perfilnome);
         TextView tvEmail = (TextView) findViewById(R.id.perfilemail);
-        TextView tvPseudonimo = (TextView) findViewById(R.id.perfilpseudonimo);
+        final TextView tvPseudonimo = (TextView) findViewById(R.id.perfilpseudonimo);
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // Name, email address, and profile photo Url
@@ -164,7 +168,51 @@ public class MainActivity extends AppCompatActivity
             tvName.setText(user.getDisplayName());
             tvEmail.setText(user.getEmail());
 
-            tvPseudonimo.setText(pseudonimo);
+
+
+
+
+
+            ValueEventListener nicklistener = new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    //obtem o apelido
+                    String valorApelido = dataSnapshot.child("Pseudonimos").child("nomePseudonimo").getValue().toString();
+                    tvPseudonimo.setText(valorApelido.toString());
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+                }
+
+
+            };
+
+
+
+            //pseudonimo mostrado
+            //tvPseudonimo.setText(Pseudonimo.getNomePseudonimo());
+
+            /*DatabaseReference datab = FirebaseDatabase.getInstance().getReference("Pseudonimos");
+
+            datab.child(datab.push().getKey()).addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    String valorPseudonimo;
+                    valorPseudonimo = dataSnapshot.child("apelido").toString();
+                    tvPseudonimo.setText(valorPseudonimo);
+                }
+
+                @Override
+                public void onCancelled(DatabaseError databaseError) {
+
+
+                }
+            });*/
+
+
+
 
             Glide.with(MainActivity.this)
                     .load(mPhotoUrl)
