@@ -36,6 +36,8 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.net.Uri;
@@ -83,6 +85,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import de.hdodenhof.circleimageview.CircleImageView;
+
+import static android.R.attr.checked;
+import static com.google.firebase.codelab.friendlychat.R.layout.perfil;
 
 public class MainActivity extends AppCompatActivity
         implements GoogleApiClient.OnConnectionFailedListener {
@@ -136,6 +141,7 @@ public class MainActivity extends AppCompatActivity
     private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
 
 
+    private int radioPerfilOpcao;
     private String userID;
 
     private String pseudonimo;
@@ -170,11 +176,15 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void LoadPerfil(){
-        setContentView(R.layout.perfil);
+        setContentView(perfil);
         ImageView ivPhoto = (ImageView) findViewById(R.id.perfilfoto);
         TextView tvName = (TextView) findViewById(R.id.perfilnome);
         TextView tvEmail = (TextView) findViewById(R.id.perfilemail);
         final TextView tvPseudonimo = (TextView) findViewById(R.id.perfilpseudonimo);
+        final RadioGroup perfilradiotipo = (RadioGroup) findViewById(R.id.perfilradiotipo);
+        final RadioButton radioperfilpessoal = (RadioButton) findViewById(R.id.radioperfilpessoal);
+        final RadioButton radioperfilpseudonimo = (RadioButton) findViewById(R.id.radioperfilpseudonimo);
+
         final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
             // Name, email address, and profile photo Url
@@ -184,12 +194,15 @@ public class MainActivity extends AppCompatActivity
 
 
 
+            // COMECANDO A MEXER AQUI
+
+            final DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Pseudonimos").child(userID.toString());
 
 
 
 
            // mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference("Messages").child();
-            DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Pseudonimos").child(userID.toString());
+            //DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("Pseudonimos").child(userID.toString());
 
 
             ref.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -198,10 +211,16 @@ public class MainActivity extends AppCompatActivity
                     if(dataSnapshot.exists()) {
                         for (DataSnapshot pseudonimoSnapshot : dataSnapshot.getChildren()) {
                             //The key of the question
-                            String pseudonimoKey = pseudonimoSnapshot.getKey();
+                            //String pseudonimoKey = pseudonimoSnapshot.getKey();
                             //And if you want to access the rest:
                             String testeNomePseudonimo = pseudonimoSnapshot.child("nomePseudonimo").getValue(String.class);
+                            String testeRadioOpcao = pseudonimoSnapshot.child("radioOpcao").getValue(String.class);
                             tvPseudonimo.setText(testeNomePseudonimo);
+
+                            // PROXIMO PASSO: RECUPERAR O DADO DO RADIO OPCAO DO FIREBASE
+
+                            //String oi = testeRadioOpcao;
+                           // perfilradiotipo.check(Integer.parseInt(testeRadioOpcao));
                         }
                     }
                     else{
@@ -213,6 +232,21 @@ public class MainActivity extends AppCompatActivity
                 public void onCancelled(DatabaseError databaseError) {
                 }
 
+            });
+
+            perfilradiotipo.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(RadioGroup perfilradiotipo, int checkedId) {
+                    Log.d(TAG, "changed");
+                    radioPerfilOpcao = perfilradiotipo.getCheckedRadioButtonId();
+
+                    Map<String, Object> optionUpdates = new HashMap<String, Object>();
+                    optionUpdates.put("radioOpcao", radioPerfilOpcao);
+
+                    ref.updateChildren(optionUpdates);
+
+
+                }
             });
 
             Glide.with(MainActivity.this)
@@ -227,7 +261,7 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-    public void LoadInserePseudonimo(FirebaseUser mFirebaseUser){
+    public void LoadInserePseudonimo(final FirebaseUser mFirebaseUser){
 
         setContentView(R.layout.pseudonimo);
         Button buttonP = (Button) findViewById(R.id.buttonP);
@@ -242,13 +276,17 @@ public class MainActivity extends AppCompatActivity
                 String frase = editTextP.getText().toString();
                 if(frase != null && !frase.isEmpty()){
                     Pseudonimo pseudo = new Pseudonimo(userID, frase);
-                    mFirebaseDatabaseReference.push().setValue(pseudo);
+                    //mFirebaseDatabaseReference.push().setValue(pseudo);
+
+                    Map<String, Object> pseudoUpdates = new HashMap<String, Object>();
+                    pseudoUpdates.put("nomePseudonimo", frase);
+
+                    mFirebaseDatabaseReference.updateChildren(pseudoUpdates);
                 }
                 LoadRooms();
             }
         });
 
-        //String key = mFirebaseDatabaseReference.child("Users").child(userID).setValue();
     }
 
     public void LoadRooms() {

@@ -8,6 +8,13 @@ public class Pseudonimo {
 
     private String userUid;
     private String nomePseudonimo;
+    private int radioOpcao;
+
+    public Pseudonimo(String userUid, String nomePseudonimo, int radioOpcao) {
+        this.userUid = userUid;
+        this.nomePseudonimo = nomePseudonimo;
+        this.radioOpcao = radioOpcao;
+    }
 
     public Pseudonimo(String userUid, String nomePseudonimo) {
         this.userUid = userUid;
@@ -32,5 +39,13 @@ public class Pseudonimo {
 
     public void setNomePseudonimo(String nomePseudonimo) {
         this.nomePseudonimo = nomePseudonimo;
+    }
+
+    public int getRadioOpcao() {
+        return radioOpcao;
+    }
+
+    public void setRadioOpcao(int radioOpcao) {
+        this.radioOpcao = radioOpcao;
     }
 }
