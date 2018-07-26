@@ -29,10 +29,12 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -46,7 +48,10 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.disklrucache.DiskLruCache;
 import com.facebook.login.LoginManager;
+import com.firebase.ui.database.FirebaseListAdapter;
+import com.firebase.ui.database.FirebaseListOptions;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.android.gms.ads.AdRequest;
 import com.google.android.gms.ads.AdView;
 import com.google.android.gms.appinvite.AppInvite;
@@ -65,6 +70,7 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
@@ -138,8 +144,9 @@ public class MainActivity extends AppCompatActivity
     private  FirebaseAuth mFirebaseAuth;
     private FirebaseUser mFirebaseUser;
     private DatabaseReference mFirebaseDatabaseReference;
-    private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
+//    private FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder> mFirebaseAdapter;
 
+    private FirebaseRecyclerAdapter mFirebaseAdapter;
 
     private int radioPerfilOpcao;
     private String userID;
@@ -372,12 +379,57 @@ public class MainActivity extends AppCompatActivity
 
         // New child entries
         mFirebaseDatabaseReference = FirebaseDatabase.getInstance().getReference("Messages").child(reference);
-        mFirebaseAdapter = new FirebaseRecyclerAdapter<FriendlyMessage,
-                MessageViewHolder>(
-                FriendlyMessage.class,
-                R.layout.item_message,
-                MessageViewHolder.class,
-                mFirebaseDatabaseReference){ //MESSAGES_CHILD
+
+        Query query = FirebaseDatabase.getInstance().getReference("Messages").child(reference);
+
+
+        FirebaseRecyclerOptions<FriendlyMessage> options =
+                new FirebaseRecyclerOptions.Builder<FriendlyMessage>()
+                        .setQuery(query, FriendlyMessage.class)
+                        .build();
+
+        mFirebaseAdapter = new FirebaseRecyclerAdapter<FriendlyMessage, MessageViewHolder>(options) {
+
+            protected void populateViewHolder(MessageViewHolder viewHolder,
+                                              FriendlyMessage friendlyMessage, int position) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                viewHolder.messageTextView.setText(friendlyMessage.getText());
+                viewHolder.messengerTextView.setText(friendlyMessage.getName());
+                if (friendlyMessage.getPhotoUrl() == null) {
+                    viewHolder.messengerImageView
+                            .setImageDrawable(ContextCompat
+                                    .getDrawable(MainActivity.this,
+                                            R.drawable.ic_account_circle_black_36dp));
+                } else {
+                    Glide.with(MainActivity.this)
+                            .load(friendlyMessage.getPhotoUrl())
+                            .into(viewHolder.messengerImageView);
+                }
+            }
+
+            @Override
+            protected void onBindViewHolder(MessageViewHolder holder, int position, FriendlyMessage model) {
+                populateViewHolder(holder,model,position);
+            }
+
+            @NonNull
+            @Override
+            public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.item_message, parent, false);
+                return new MessageViewHolder(view);
+            }
+
+        };
+
+
+
+        /*
+        FirebaseListOptions<FriendlyMessage> options = new FirebaseListOptions.Builder<FriendlyMessage>()
+                .setQuery(query, FriendlyMessage.class)
+                .build();
+
+        mFirebaseAdapter = new FirebaseListAdapter<FriendlyMessage>(options) {
 
             @Override
             protected void populateViewHolder(MessageViewHolder viewHolder,
@@ -397,6 +449,49 @@ public class MainActivity extends AppCompatActivity
                 }
             }
         };
+
+*/
+
+        /*
+        mFirebaseAdapter = new FirebaseRecyclerAdapter<FriendlyMessage,
+                MessageViewHolder>(
+                FriendlyMessage.class,
+                R.layout.item_message,
+                MessageViewHolder.class,
+                mFirebaseDatabaseReference){ //MESSAGES_CHILD
+
+            protected void populateViewHolder(MessageViewHolder viewHolder,
+                                              FriendlyMessage friendlyMessage, int position) {
+                mProgressBar.setVisibility(ProgressBar.INVISIBLE);
+                viewHolder.messageTextView.setText(friendlyMessage.getText());
+                viewHolder.messengerTextView.setText(friendlyMessage.getName());
+                if (friendlyMessage.getPhotoUrl() == null) {
+                    viewHolder.messengerImageView
+                            .setImageDrawable(ContextCompat
+                                    .getDrawable(MainActivity.this,
+                                            R.drawable.ic_account_circle_black_36dp));
+                } else {
+                    Glide.with(MainActivity.this)
+                            .load(friendlyMessage.getPhotoUrl())
+                            .into(viewHolder.messengerImageView);
+                }
+            }
+
+            @Override
+            protected void onBindViewHolder(MessageViewHolder holder, int position, FriendlyMessage model) {
+                populateViewHolder(holder,model,position);
+            }
+
+            @NonNull
+            @Override
+            public MessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+                View view = LayoutInflater.from(parent.getContext())
+                        .inflate(R.layout.item_message, parent, false);
+                return new MessageViewHolder(view);
+            }
+        };
+
+*/
 
         mFirebaseAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
@@ -459,10 +554,19 @@ public class MainActivity extends AppCompatActivity
     }
 
     @Override
+    public void onStop(){
+        super.onStop();
+        mFirebaseAdapter.stopListening();
+    }
+
+    @Override
     public void onStart() {
         super.onStart();
         // Check if user is signed in.
         // TODO: Add code to check if user is signed in.
+
+
+        mFirebaseAdapter.startListening();
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
