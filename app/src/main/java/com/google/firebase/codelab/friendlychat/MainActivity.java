@@ -355,7 +355,6 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View v) {
                 String reference = "Maternidade";
                 StartRoom(reference);
-
             }
         });
 
@@ -422,7 +421,7 @@ public class MainActivity extends AppCompatActivity
 
         };
 
-
+        mFirebaseAdapter.startListening();
 
         /*
         FirebaseListOptions<FriendlyMessage> options = new FirebaseListOptions.Builder<FriendlyMessage>()
@@ -556,7 +555,8 @@ public class MainActivity extends AppCompatActivity
     @Override
     public void onStop(){
         super.onStop();
-        mFirebaseAdapter.stopListening();
+        if (mFirebaseAdapter != null)
+            mFirebaseAdapter.stopListening();
     }
 
     @Override
@@ -566,7 +566,8 @@ public class MainActivity extends AppCompatActivity
         // TODO: Add code to check if user is signed in.
 
 
-        mFirebaseAdapter.startListening();
+        if (mFirebaseAdapter != null)
+            mFirebaseAdapter.startListening();
 
         // Initialize Firebase Auth
         mFirebaseAuth = FirebaseAuth.getInstance();
@@ -633,6 +634,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(new Intent(this, SignInActivity.class));
                 return true;
             case R.id.menuVoltar:
+                desconectar();
                 setContentView(R.layout.room);
                 startActivity(new Intent(this, MainActivity.class));
                 return true;
@@ -640,6 +642,7 @@ public class MainActivity extends AppCompatActivity
                LoadPerfil();
                 return true;
             case R.id.btnSalas:
+                desconectar();
                 LoadRooms();
             default:
                 return super.onOptionsItemSelected(item);
@@ -652,6 +655,13 @@ public class MainActivity extends AppCompatActivity
         // be available.
         Log.d(TAG, "onConnectionFailed:" + connectionResult);
         Toast.makeText(this, "Google Play Services error.", Toast.LENGTH_SHORT).show();
+    }
+
+    public void desconectar(){
+        if(mGoogleApiClient != null) {
+            mGoogleApiClient.stopAutoManage(this);
+            mGoogleApiClient.disconnect();
+        }
     }
 
 }
